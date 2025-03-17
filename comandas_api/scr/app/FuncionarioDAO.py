@@ -2,10 +2,13 @@ from fastapi import APIRouter
 from domain.entities.Funcionario import Funcionario
 import db
 from infra.orm.FuncionarioModel import FuncionarioDB
-router = APIRouter()
+from typing import Annotated
+from fastapi import Depends
+from security import get_current_active_user, User
+router = APIRouter( dependencies=[Depends(get_current_active_user)] )
 
-@router.get("/funcionario/", tags=["Funcionário"])
-async def get_funcionario():
+@router.get("/funcionario/", tags=["Funcionário"], dependencies=[Depends(get_current_active_user)], )
+async def get_funcionario( current_user:Annotated[User, Depends(get_current_active_user)], ):
     try:
         session = db.Session()
         # Busca todos

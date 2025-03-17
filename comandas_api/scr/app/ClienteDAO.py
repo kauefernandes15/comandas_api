@@ -1,13 +1,15 @@
-from fastapi import APIRouter
+from fastapi import APIRouter, Depends
 from domain.entities.Cliente import Cliente
 import db
 from infra.orm.ClienteModel import ClienteDB
+from typing import Annotated
+from security import get_current_active_user, User
 
-router = APIRouter()
+router = APIRouter(dependencies=[Depends(get_current_active_user)])
 
 # Rota para buscar todos os clientes
 @router.get("/cliente/", tags=["Cliente"])
-async def get_cliente():
+async def get_cliente(current_user: Annotated[User, Depends(get_current_active_user)]):
     try:
         session = db.Session()
         dados = session.query(ClienteDB).all()
@@ -19,7 +21,7 @@ async def get_cliente():
 
 # Rota para buscar um cliente específico pelo ID
 @router.get("/cliente/{id}", tags=["Cliente"])
-async def get_cliente(id: int):
+async def get_cliente_por_id(id: int):
     try:
         session = db.Session()
         dados = session.query(ClienteDB).filter(ClienteDB.id_cliente == id).all()
@@ -34,7 +36,11 @@ async def get_cliente(id: int):
 async def post_cliente(corpo: Cliente):
     try:
         session = db.Session()
-        dados = ClienteDB(None, corpo.nome, corpo.cpf, corpo.telefone)
+        dados = ClienteDB(
+        nome=corpo.nome,
+        cpf=corpo.cpf,
+        telefone=corpo.telefone
+)
         session.add(dados)
         session.commit()
         return {"id": dados.id_cliente}, 200

@@ -2,12 +2,15 @@ from fastapi import APIRouter
 from domain.entities.Produto import Produto
 import db
 from infra.orm.ProdutoModel import ProdutoDB
+from typing import Annotated
+from fastapi import Depends
+from security import get_current_active_user, User
 
-router = APIRouter()
+router = APIRouter( dependencies=[Depends(get_current_active_user)] )
 
 # Rota para buscar todos os produtos
-@router.get("/produto/", tags=["Produto"])
-async def get_produto():
+@router.get("/produto/", tags=["Produto"], dependencies=[Depends(get_current_active_user)], )
+async def get_produto( current_user:Annotated[User, Depends(get_current_active_user)], ):
     try:
         session = db.Session()
         dados = session.query(ProdutoDB).all()

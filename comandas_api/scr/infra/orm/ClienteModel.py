@@ -10,8 +10,8 @@ class ClienteDB(db.Base):
     cpf = Column(CHAR(11), unique=True, nullable=False, index=True)
     telefone = Column(CHAR(11), nullable=False)
 
-    def __init__(self, id_cliente, nome, cpf, telefone):
-        self.id_cliente = id_cliente
+    def __init__(self, nome, cpf, telefone):
+        
         self.nome = nome
         self.cpf = cpf
         self.telefone = telefone
